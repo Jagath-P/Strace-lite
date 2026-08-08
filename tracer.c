@@ -1,16 +1,7 @@
-// tracer.c — intercepts every syscall made by "ls"
-#include <linux/ptrace.h>
-#include <stddef.h>
-#include <string.h>
-#define _GNU_SOURCE
-#include <stdio.h>
-// #include <sys/ptrace.h>
 #include "include/api.h"
 #include "include/flag_functions.h"
-#include "include/syscall_table.h"
-#include <sys/user.h> // struct user_regs_struct
-#include <sys/wait.h>
-#include <unistd.h>
+#include "include/syscall.h"
+#include <stdio.h>
 
 int main(int argc, char *argv[]) {
 
@@ -19,5 +10,9 @@ int main(int argc, char *argv[]) {
     return 0;
   }
 
-  start_trace(argv);
+  int ret = parse_args(argc, argv);
+  if (ret < 0) {
+    printf("Incorrect format used!, Try again!!\n");
+  }
+  start_trace(argv, ret);
 }

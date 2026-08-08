@@ -2,7 +2,6 @@
 #include <stddef.h>
 
 #include "include/api.h"
-#include <stddef.h>
 #include <stdio.h>
 #include <string.h>
 #include <sys/wait.h>
