@@ -1,5 +1,5 @@
 #include "include/api.h"
-#include "include/flag_functions.h"
+#include "include/config.h"
 #include "include/syscall.h"
 #include <stdio.h>
 
@@ -9,10 +9,14 @@ int main(int argc, char *argv[]) {
     printf("Just nothing!, try using any of the functions of strace-lite\n");
     return 0;
   }
+  struct config cfg = {0};
 
-  int ret = parse_args(argc, argv);
-  if (ret < 0) {
-    printf("Incorrect format used!, Try again!!\n");
-  }
-  start_trace(argv, ret);
+  int ret = parse_args(argc, argv, &cfg);
+  if (ret == -1) {
+    printf("No filter mentioned! Try again \n");
+    exit(0);
+  } else if (ret == -2) {
+    start_trace(argv, 3, &cfg);
+  } else
+    start_trace(argv, ret, &cfg);
 }
