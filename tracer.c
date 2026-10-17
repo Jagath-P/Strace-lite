@@ -50,8 +50,14 @@ void start_trace(char *argv[], int pos, struct config *cfg) {
         curr = info.entry.nr;
         clock_gettime(CLOCK_MONOTONIC, &ts);
         entry_time = ts.tv_sec * 1000000000LL + ts.tv_nsec;
+
+        if (cfg->show_files && curr == 257) {
+          char buf[256];
+          read_string(child, info.entry.args[1], buf, sizeof(buf));
+          printf("%s\n", buf);
+        }
         if ((cfg->filter_enabled && cfg->filter[curr] != true) ||
-            cfg->summary) {
+            cfg->summary || cfg->show_files) {
           ptrace(PTRACE_SYSCALL, child, NULL, NULL);
           continue;
         }
@@ -66,7 +72,7 @@ void start_trace(char *argv[], int pos, struct config *cfg) {
           st[curr].errors += 1;
         }
         if ((cfg->filter_enabled && cfg->filter[curr] != true) ||
-            cfg->summary) {
+            cfg->summary || cfg->show_files) {
           ptrace(PTRACE_SYSCALL, child, NULL, NULL);
           continue;
         }

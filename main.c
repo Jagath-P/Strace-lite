@@ -22,12 +22,13 @@ int main(int argc, char *argv[]) {
     start_trace(argv, ret, &cfg);
 
   if (cfg.summary) {
+    printf("\n%-16s %8s %8s %12s\n", "syscall", "calls", "errors", "time (ms)");
     for (int i = 0; i < 512; i++) {
-      if (st[i].calls > 0) {
-        printf("syscall : %d ", i);
-        printf("calls: %d ", st[i].calls);
-        printf("errors: %d time_taken: %d\n", st[i].errors, st[i].ns);
-      }
+      if (st[i].calls == 0)
+        continue;
+      const struct syscall_def *sc = find_syscall(i);
+      printf("%-16s %8d %8d %12.3f\n", sc ? sc->name : "?", st[i].calls,
+             st[i].errors, st[i].ns / 1e6);
     }
   }
 }
