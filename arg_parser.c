@@ -4,8 +4,6 @@
 #include <stdio.h>
 #include <string.h>
 
-struct options Tropt = {0};
-
 int extract_strings(char *s, struct config *cfg) {
   char *x = strtok(s, ",");
   if (!x)
@@ -26,7 +24,6 @@ int extract_strings(char *s, struct config *cfg) {
 int parse_args(int argc, char *argv[], struct config *cfg) {
   int i = 1;
   while (i < argc) {
-    printf("arg %d\n", i);
     char *s = argv[i];
     if (!strcmp(s, "-e")) {
       cfg->filter_enabled = true;

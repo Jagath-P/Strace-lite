@@ -30,6 +30,8 @@ void start_trace(char *argv[], int pos, struct config *cfg) {
         break;
       }
 
+      // to filter the normal execve syscall sigtrap return which causes the
+      // info.op to be PTRACE_SYSCALL_INFO_NONE and break
       if (!(WIFSTOPPED(status) && WSTOPSIG(status) == (SIGTRAP | 0x80))) {
         ptrace(PTRACE_SYSCALL, child, NULL, NULL);
         continue;
@@ -41,17 +43,19 @@ void start_trace(char *argv[], int pos, struct config *cfg) {
       if (info.op == PTRACE_SYSCALL_INFO_ENTRY) {
         char buf[40];
         curr = info.entry.nr;
-        if (cfg->filter[curr] != true) {
+        if (cfg->filter_enabled && cfg->filter[curr] != true) {
           ptrace(PTRACE_SYSCALL, child, NULL, NULL);
           continue;
         }
-        printf("syscall : %llu\n", info.entry.nr);
+        printf("Syscall : %lld\n", info.entry.nr);
+
+        print_args(info.entry.args, info.entry.nr, child);
       } else if (info.op == PTRACE_SYSCALL_INFO_EXIT) {
-        if (cfg->filter[curr] != true) {
+        if (cfg->filter_enabled && cfg->filter[curr] != true) {
           ptrace(PTRACE_SYSCALL, child, NULL, NULL);
           continue;
         }
-        printf("return value for syscall no: %d is %lld\n", curr,
+        printf("Return value for syscall no: %d is %lld\n\n", curr,
                info.exit.rval);
       } else if (info.op == PTRACE_SYSCALL_INFO_NONE)
         break;
