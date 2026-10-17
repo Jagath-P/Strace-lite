@@ -20,4 +20,14 @@ int main(int argc, char *argv[]) {
     start_trace(argv, 3, &cfg);
   } else
     start_trace(argv, ret, &cfg);
+
+  if (cfg.summary) {
+    for (int i = 0; i < 512; i++) {
+      if (st[i].calls > 0) {
+        printf("syscall : %d ", i);
+        printf("calls: %d ", st[i].calls);
+        printf("errors: %d time_taken: %d\n", st[i].errors, st[i].ns);
+      }
+    }
+  }
 }

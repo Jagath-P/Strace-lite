@@ -67,7 +67,7 @@ void print_args(unsigned long long args[], int syscall_num, pid_t child) {
     if (sc->argtypes[i] == ARG_INT) {
       printf("arg %d: %lld", i + 1, args[i]);
     } else if (sc->argtypes[i] == ARG_FD) {
-      printf("args %d: ", i + 1);
+      printf("arg %d: ", i + 1);
       if ((int)args[i] == AT_FDCWD)
         printf("AT_FDCWD");
       else

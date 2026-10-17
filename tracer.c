@@ -1,6 +1,7 @@
 #include "include/api.h"
 #include "include/config.h"
 #include "include/syscall.h"
+#include <bits/time.h>
 #include <linux/ptrace.h>
 #include <signal.h>
 #include <stddef.h>
@@ -8,11 +9,14 @@
 #include <string.h>
 #include <sys/user.h> // struct user_regs_struct
 #include <sys/wait.h>
+#include <time.h>
 #include <unistd.h>
 
+struct stats st[512] = {0};
 void start_trace(char *argv[], int pos, struct config *cfg) {
   pid_t child = fork();
   int status;
+  struct timespec ts;
   if (child == 0) {
     ptrace(PTRACE_TRACEME, 0, NULL, NULL);
     raise(SIGSTOP);
@@ -24,8 +28,9 @@ void start_trace(char *argv[], int pos, struct config *cfg) {
     ptrace(PTRACE_SETOPTIONS, child, NULL, PTRACE_O_TRACESYSGOOD);
     ptrace(PTRACE_SYSCALL, child, NULL, NULL);
     int curr = 0;
+    long long entry_time = 0;
     while (1) {
-      waitpid(child, &status, NULL);
+      waitpid(child, &status, 0);
       if (WIFEXITED(status) || WIFSIGNALED(status)) {
         break;
       }
@@ -43,7 +48,10 @@ void start_trace(char *argv[], int pos, struct config *cfg) {
       if (info.op == PTRACE_SYSCALL_INFO_ENTRY) {
         char buf[40];
         curr = info.entry.nr;
-        if (cfg->filter_enabled && cfg->filter[curr] != true) {
+        clock_gettime(CLOCK_MONOTONIC, &ts);
+        entry_time = ts.tv_sec * 1000000000LL + ts.tv_nsec;
+        if ((cfg->filter_enabled && cfg->filter[curr] != true) ||
+            cfg->summary) {
           ptrace(PTRACE_SYSCALL, child, NULL, NULL);
           continue;
         }
@@ -51,10 +59,18 @@ void start_trace(char *argv[], int pos, struct config *cfg) {
 
         print_args(info.entry.args, info.entry.nr, child);
       } else if (info.op == PTRACE_SYSCALL_INFO_EXIT) {
-        if (cfg->filter_enabled && cfg->filter[curr] != true) {
+        clock_gettime(CLOCK_MONOTONIC, &ts);
+        st[curr].ns += (ts.tv_sec * 1000000000LL + ts.tv_nsec - entry_time);
+        st[curr].calls += 1;
+        if (info.exit.is_error) {
+          st[curr].errors += 1;
+        }
+        if ((cfg->filter_enabled && cfg->filter[curr] != true) ||
+            cfg->summary) {
           ptrace(PTRACE_SYSCALL, child, NULL, NULL);
           continue;
         }
+
         printf("Return value for syscall no: %d is %lld\n\n", curr,
                info.exit.rval);
       } else if (info.op == PTRACE_SYSCALL_INFO_NONE)
