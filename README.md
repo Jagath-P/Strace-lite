@@ -1,6 +1,6 @@
 # Strace-lite
 
-A Remake of classic Strace project with limited core functionalities
+A minimalist debugging,diagnostic utility for Linux. It helps you observe how user level program interacts with the operating system.
 
 The following functionalities are available
 
@@ -32,3 +32,8 @@ The following functionalities are available
 - display signal info
 - `-p` attach tracer to already existing process
 - syscall injection feature to modify the arguments of syscalls
+
+## Acknowledgements
+
+Inspired by strace. This project explores what can be traced from user space
+with ptrace, and where the limits of that approach are.
