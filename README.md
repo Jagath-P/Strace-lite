@@ -25,3 +25,10 @@ The following functionalities are available
 - x86_64 Linux only
 - Decodes arguments of most common syscalls, (remaining ones need to be added yet!)
 - `-c` timings include the ptrace stop overhead and the actual kernel work
+
+## Further
+
+- `-o` flag to redirect output to a file
+- display signal info
+- `-p` attach tracer to already existing process
+- syscall injection feature to modify the arguments of syscalls
