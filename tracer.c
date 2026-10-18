@@ -46,7 +46,6 @@ void start_trace(char *argv[], int pos, struct config *cfg) {
       long ret = ptrace(PTRACE_GET_SYSCALL_INFO, child, sizeof(info), &info);
 
       if (info.op == PTRACE_SYSCALL_INFO_ENTRY) {
-        char buf[40];
         curr = info.entry.nr;
         clock_gettime(CLOCK_MONOTONIC, &ts);
         entry_time = ts.tv_sec * 1000000000LL + ts.tv_nsec;
