@@ -8,9 +8,11 @@ The following functionalities are available
 
 - `./tracer -c ls` will display a summary of all the syscalls involved.
 
--`./tracer -e openat,write,mmap cat tracer.c` will filter only mentioned syscalls after -e flag and displays them
+- `./tracer -e openat,write,mmap cat tracer.c` will filter only mentioned syscalls after -e flag and displays them
 
 - `./tracer -J firefox` will display all the files opened in the process of invoking the actual firefox binary file.
+
+- <img width="2522" height="1143" alt="Screenshot from 2026-10-18 10-50-19" src="https://github.com/user-attachments/assets/66aadf1a-e41c-4a5b-b65f-b18e385a1b65" />
 
 ## Building the executable
 
